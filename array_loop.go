@@ -17,4 +17,9 @@ func main() {
 		fmt.Printf("\nIndex :%v, Value :%v ", i, v)
 	}
 
+	// Using range form of the for loop, with index not needed
+	for _, v := range a {
+		fmt.Printf("\nValue :%v ", v)
+	}
+
 }
