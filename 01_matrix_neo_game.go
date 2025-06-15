@@ -55,7 +55,7 @@ func main() {
 		fmt.Println(blue_pill_logo)
 
 	default:
-		defer fmt.Println("Nikal pahli fursat me!")
+		defer fmt.Println("Nikal pahli fursat me!") // defer is equivalent to finally in Python; it executes in the end!
 		fmt.Println("Wrong choice ! You had to choose 1 for Red, or 2 for Blue")
 
 	}
