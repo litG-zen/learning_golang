@@ -5,7 +5,7 @@ import "fmt"
 func fib() func() int {
 	var fib_seq []int
 	pos := 0
-	return func() int {
+	return func() int { // This is an anonymous function !
 		if pos == 0 {
 			fib_seq = append(fib_seq, 0)
 			pos += 1
