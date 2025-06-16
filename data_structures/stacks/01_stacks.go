@@ -3,12 +3,10 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 // Stack using Arrays
-
-// This program is a failed version of stack using Go by using slices, because the slice intiation to STACK_SIZE
-// will create an array of 0s, resulting in StackOverflow when we attempt Push.
 
 /*
 Basic Operations:
@@ -22,9 +20,13 @@ isFull: Checks if the stack is full (relevant when using arrays).
 const STACK_SIZE = 10
 
 func main() {
-	stack := make([]int, STACK_SIZE)
-
+	stack := make([]int, 0, STACK_SIZE)
+	var popped_val int
 	fmt.Printf("Stack initaited: data:%v capacity:%v current_size :%v; ", stack, cap(stack), len(stack))
+
+	top_val, is_empty := Peek(stack)
+
+	fmt.Printf("\nStack's topmost value! value: %v, is_stack_empty: %v", top_val, is_empty)
 
 	fmt.Printf("\nStack filing initiated!")
 	for i := 0; i < 5; i++ {
@@ -32,10 +34,29 @@ func main() {
 		stack = Push(rand.Intn(STACK_SIZE*10), stack)
 	}
 
-	fmt.Printf("Stack status after filling: data:%v capacity:%v current_size :%v; ", stack, cap(stack), len(stack))
+	fmt.Printf("\nStack status after filling: data:%v capacity:%v current_size :%v; ", stack, cap(stack), len(stack))
+	top_val, is_empty = Peek(stack)
+
+	fmt.Printf("\nStack's topmost value! value: %v, is_stack_empty: %v", top_val, is_empty)
+
+	time.Sleep(500 * time.Microsecond)
+	fmt.Printf("\nInitiating stack popping")
+	for {
+		popped_val, stack = Pop(stack)
+		if popped_val == -1 {
+			break
+		}
+		fmt.Printf("\nPopped value : %v", popped_val)
+	}
 
 }
 
+func Peek(stack []int) (int, bool) {
+	if IsEmpty(stack) {
+		return -1, true
+	}
+	return stack[len(stack)-1], false
+}
 func IsEmpty(stack []int) bool {
 	if len(stack) == 0 {
 		return true
@@ -62,11 +83,11 @@ func Push(val int, stack []int) []int {
 
 func Pop(stack []int) (int, []int) {
 	if IsEmpty(stack) {
-		fmt.Println("Stack in empty!")
+		fmt.Println("Stack is empty!")
 		return -1, stack
 	} else {
 		val := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
+		stack = stack[:(len(stack) - 1)]
 		return val, stack
 	}
 }
