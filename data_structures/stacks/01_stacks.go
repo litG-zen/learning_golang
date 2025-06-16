@@ -35,8 +35,8 @@ func main() {
 	}
 
 	fmt.Printf("\nStack status after filling: data:%v capacity:%v current_size :%v; ", stack, cap(stack), len(stack))
-	top_val, is_empty = Peek(stack)
 
+	top_val, is_empty = Peek(stack)
 	fmt.Printf("\nStack's topmost value! value: %v, is_stack_empty: %v", top_val, is_empty)
 
 	time.Sleep(500 * time.Microsecond)
