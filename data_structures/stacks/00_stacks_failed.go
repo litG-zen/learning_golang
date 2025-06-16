@@ -22,7 +22,7 @@ isFull: Checks if the stack is full (relevant when using arrays).
 const STACK_SIZE = 10
 
 func main() {
-	stack := make([]int, STACK_SIZE)
+	stack := make([]int, STACK_SIZE) // **We should use make([]Type, 0, capacity) to initiate an empty slice
 
 	fmt.Printf("Stack initaited: data:%v capacity:%v current_size :%v; ", stack, cap(stack), len(stack))
 
