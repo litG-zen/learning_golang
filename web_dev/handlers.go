@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"web_test/auth"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +21,13 @@ func PingHandler(c *gin.Context) {
 
 func AsyncAPIHandler(c *gin.Context) {
 	fmt.Println("\n\n Async API hander called")
+
+	token := c.GetHeader("API-KEY")
+
+	if token != auth.API_KEY {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid API key!"})
+		return
+	}
 
 	go func() {
 		// I have added this goroutine to mimick a blocking function like email-sending, heavy calculation

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,15 +12,37 @@ import (
 // reference site : https://gin-gonic.com/en/docs/quickstart/
 
 func main() {
+	// Setting DEBUG mode ON
+	gin.SetMode(gin.DebugMode)
+
 	app := gin.Default()
+
+	// Defining folder to load templates from
+	app.LoadHTMLGlob("templates/*")
+
+	app.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"message": "rendering HTML",
+		})
+	})
 
 	app.GET("/ping", PingHandler)
 
 	app.GET("/health", func(c *gin.Context) { //anonymous function approach
+
+		greetints := []string{
+			"Waah kya scene hai",
+			"Sab Changa si!",
+			"Bindassss",
+			"Bhai lagi padi hai!",
+			"Rest kar lijie bhrata",
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Sab Changa si!",
+			"message": greetints[rand.Intn(len(greetints))],
 		})
 	})
+
 	app.GET("/async/api", AsyncAPIHandler)
 
 	app.POST("/show_details", func(c *gin.Context) {
