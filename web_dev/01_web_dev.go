@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +15,19 @@ func ping_handler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 		"owner":   "Lit",
+	})
+}
+
+func async_api_handler(c *gin.Context) {
+	fmt.Println("\n\n Async API hander called")
+
+	go func() {
+		time.Sleep(10000 * time.Millisecond)
+		print("\n\n\n Sleep ended \n\n\n")
+	}()
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "this is a successful response of AsyncAPI call",
 	})
 }
 
@@ -31,6 +46,7 @@ func main() {
 			"message": "Sab Changa si!",
 		})
 	})
+	app.GET("/async/api", async_api_handler)
 
 	app.POST("/show_details", func(c *gin.Context) {
 		var validator PostBodyExample
