@@ -32,7 +32,6 @@ func SelectCelebrity(mat [][]int) int {
 }
 
 func main() {
-
 	mat_1 := [][]int{
 		{1, 1, 1},
 		{0, 1, 0},
