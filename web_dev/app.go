@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"time"
+
+	"web_test/logs"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +27,9 @@ func main() {
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"message": "rendering HTML",
 		})
+
+		log_string := fmt.Sprintf("%v %v %v", time.Now(), c.FullPath(), http.StatusOK)
+		logs.Logger(log_string, false)
 	})
 
 	app.GET("/ping", PingHandler)

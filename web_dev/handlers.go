@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"web_test/auth"
+	"web_test/logs"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,9 @@ func PingHandler(c *gin.Context) {
 		"message": "pong",
 		"owner":   "Lit",
 	})
+
+	log_string := fmt.Sprintf("%v %v %v", time.Now(), c.FullPath(), http.StatusOK)
+	logs.Logger(log_string, false)
 }
 
 func AsyncAPIHandler(c *gin.Context) {
@@ -25,7 +29,9 @@ func AsyncAPIHandler(c *gin.Context) {
 	token := c.GetHeader("API-KEY")
 
 	if token != auth.API_KEY {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid API key!"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": INVALID_API_MSG})
+		log_string := fmt.Sprintf("%v %v %v %v", time.Now(), c.FullPath(), http.StatusUnauthorized, INVALID_API_MSG)
+		logs.Logger(log_string, true)
 		return
 	}
 
@@ -39,4 +45,7 @@ func AsyncAPIHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "this is a successful response of AsyncAPI call",
 	})
+
+	log_string := fmt.Sprintf("%v %v %v %v", time.Now(), c.FullPath(), http.StatusUnauthorized, "SUCCESS")
+	logs.Logger(log_string, false)
 }
