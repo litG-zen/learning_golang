@@ -32,6 +32,20 @@ func CloseLogFiles() {
 			continue
 		} else {
 			// Close the file
+
+			// 2025-06-21 :
+			// To close a file in Golang, we need to have it file's memory-location-address
+			// as is passed in the fundamental building program named file_handling_using_defer.go/closeFile() function.
+			// What had kept me bugging was how can I access memory location of an existing file without opening it just from its file_path...
+			// I don't want to jump onto chatgpt and get the answer. If the purpose of this journey has been to learn;
+			// lets overcome all the blockers as we learn.
+
+			// Few intutions
+			/*
+				- using channel approach
+				- maintaing `map[log_dir_str] register-block-address` of the access/error log of that day(Since we are maintaing date_string level docs in logs/<YYYY_MM_DD>)
+				-
+			*/
 		}
 	}
 }
