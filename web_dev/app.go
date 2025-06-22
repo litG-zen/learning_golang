@@ -36,7 +36,7 @@ func main() {
 
 	app.GET("/health", func(c *gin.Context) { //anonymous function approach
 
-		greetints := []string{
+		greetings := []string{
 			"Waah kya scene hai",
 			"Sab Changa si!",
 			"Bindassss",
@@ -45,7 +45,7 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": greetints[rand.Intn(len(greetints))],
+			"message": greetings[rand.Intn(len(greetings))],
 		})
 	})
 
