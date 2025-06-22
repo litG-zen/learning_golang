@@ -49,7 +49,7 @@ func CloseLogFiles() {
 
 			// 2025-06-22
 			// Can't keep on digging for such a basic thing!.. lets keep it open for now and will delete the logs after expiration_time
-			// Note: Mimicking how /var/logs/nginx/access.log|error.logs gets auto deleted based on a config defined in /etc/nginx
+			// Note: Mimicking how /var/logs/nginx/access.log|error.logs gets auto deleted based on a config defined in /etc/ngit ginx
 			// Kuch aur machate hai ab :P
 		}
 	}

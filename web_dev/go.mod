@@ -2,7 +2,10 @@ module web_test
 
 go 1.24.4
 
-require github.com/gin-gonic/gin v1.10.1
+require (
+	github.com/gin-gonic/gin v1.10.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
+)
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
