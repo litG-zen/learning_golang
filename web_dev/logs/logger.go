@@ -46,6 +46,11 @@ func CloseLogFiles() {
 				- maintaing `map[log_dir_str] register-block-address` of the access/error log of that day(Since we are maintaing date_string level docs in logs/<YYYY_MM_DD>)
 				-
 			*/
+
+			// 2025-06-22
+			// Can't keep on digging for such a basic thing!.. lets keep it open for now and will delete the logs after expiration_time
+			// Note: Mimicking how /var/logs/nginx/access.log|error.logs gets auto deleted based on a config defined in /etc/nginx
+			// Kuch aur machate hai ab :P
 		}
 	}
 }
