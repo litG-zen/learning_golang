@@ -69,5 +69,5 @@ func main() {
 			})
 	})
 
-	app.Run(":" + fmt.Sprint(PORT)) // listen and serve on 0.0.0.0:8000 (for windows "localhost:8000")
+	app.Run(":" + fmt.Sprint(PORT)) // listen and serve on 0.0.0.0:<random_port> (for windows "localhost:<rand_port>")
 }
