@@ -53,9 +53,14 @@ func main() {
 			log.Fatal("listening :", err)
 
 		}
+		// since berkeley sockets are a type of files in Linux terms, our getLinesChannel() which expects an io Reader will work here.
 		for line := range getLinesChannel(conn) {
 			fmt.Printf("read : %s\n", line)
 		}
 	}
 
 }
+
+// to run this script, open two shells
+// in first shell run -> go run <file_name>
+// in another shell run -> echo "This is a test\nWow" | nc -c -w 1 127.0.0.1 8080
