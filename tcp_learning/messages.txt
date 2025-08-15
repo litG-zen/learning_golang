@@ -1,0 +1,3 @@
+This is a simple text file for the first stage of the tcp streaming.
+We will first read streams from a file, this is that file.
+Lets GOOOOO!
