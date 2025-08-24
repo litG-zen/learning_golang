@@ -17,11 +17,20 @@ func main() {
 
 	// Send some messages
 	messages := []string{
+		/*
+			As per RFC 9110 semantics, the HTTP connection request is nothing but a steam of data with \r\n
+			as the separator.
+			The first line represents API method, path and HTTP version used definition.
+			The later lines represent headers.
+			A single line where the line content is only \r\n represents request separator
+			than means that the lines that follow will contain request body ( if any ).
+		*/
 		"GET /connect HTTP1.1 \r\n",
 		"Header1 Value1 \r\n",
 		"Header2 Value2 \r\n",
 		"Header3 Value3 \r\n",
 		"Accept */* \r\n",
+		"\r\n",
 	}
 
 	for _, msg := range messages {
