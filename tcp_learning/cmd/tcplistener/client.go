@@ -17,9 +17,11 @@ func main() {
 
 	// Send some messages
 	messages := []string{
-		"KYA bolti public\n",
-		"Machayenge naaa\n",
-		"Wow, streaming data is fun!\n",
+		"GET /connect HTTP1.1 \r\n",
+		"Header1 Value1 \r\n",
+		"Header2 Value2 \r\n",
+		"Header3 Value3 \r\n",
+		"Accept */* \r\n",
 	}
 
 	for _, msg := range messages {
