@@ -14,7 +14,7 @@ func main() {
 		panic(err)
 	}
 	defer conn.Close()
-
+	post_body := "{'body':'this is a text', 'test':'this is a test'}"
 	// Send some messages
 	messages := []string{
 		/*
@@ -26,12 +26,12 @@ func main() {
 			than means that the lines that follow will contain request body ( if any ).
 		*/
 		"POST /send_data HTTP1.1 \r\n",
-		"Header1 Value1 \r\n",
-		"Header2 Value2 \r\n",
+		"Content-Type application/json \r\n",
+		"Content-Length" + string(len(post_body)) + "\r\n",
 		"Header3 Value3 \r\n",
 		"Accept */* \r\n",
 		"\r\n",
-		"{'body':'this is a text', 'test':'this is a test'}",
+		post_body,
 	}
 
 	for _, msg := range messages {
