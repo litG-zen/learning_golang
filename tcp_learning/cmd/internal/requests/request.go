@@ -47,19 +47,17 @@ func ParseRequestLine(b []byte) (*RequestLine, int, error) {
 	read := idx + len(SEPARATOR)
 
 	parts := bytes.Split(startLine, []byte(" ")) // we get an array of [Method, path, http-version]
-	if len(parts) != 3 {
-		return nil, 0, MALFORMED_REQ_LINE
-	}
-	httpParts := bytes.Split(parts[2], []byte("/"))
-
-	if len(httpParts) != 2 || string(httpParts[0]) != "HTTP" || string(httpParts[1]) != "1.1" {
-		return nil, 0, UNSUPPORTED_HTTP_VER
-	}
 
 	// Since as per RFC9110 message-parsing protocol, the startline should only have single-space as separators
 	// length  of parts must be 3.
 	if len(parts) != 3 {
 		return nil, 0, MALFORMED_REQ_LINE
+	}
+
+	httpParts := bytes.Split(parts[2], []byte("/"))
+
+	if len(httpParts) != 2 || string(httpParts[0]) != "HTTP" || string(httpParts[1]) != "1.1" {
+		return nil, 0, UNSUPPORTED_HTTP_VER
 	}
 	rl := &RequestLine{
 		RequestTarget: string(parts[1]),
@@ -97,24 +95,46 @@ outer:
 func (r *Request) done() bool {
 	return r.state == StateDone
 }
-
 func RequestFromReader(reader io.Reader) (*Request, error) {
 	request := newRequest()
 	buf := make([]byte, 1024)
 	bufLen := 0
+
 	for !request.done() {
 		n, err := reader.Read(buf[bufLen:])
-		if err != nil {
-			return nil, err
-		}
-		readN, err := request.parse(buf[:bufLen+n])
-		if err != nil {
-			return nil, err
+		if n > 0 {
+			// Try to parse including the newly read bytes
+			readN, pErr := request.parse(buf[:bufLen+n])
+			if pErr != nil {
+				return nil, pErr
+			}
+			// Keep the unread tail (including part of the newly read bytes)
+			copy(buf, buf[readN:bufLen+n])
+			bufLen = bufLen + n - readN
 		}
 
-		// moving  data to beginning , and readjusting buffer length
-		copy(buf, buf[readN:bufLen])
-		bufLen -= readN
+		if err != nil {
+			if err == io.EOF {
+				// Final attempt to parse whatever remains
+				readN, pErr := request.parse(buf[:bufLen])
+				if pErr != nil {
+					return nil, pErr
+				}
+				copy(buf, buf[readN:bufLen])
+				bufLen = bufLen - readN
+
+				if request.done() {
+					break
+				}
+				// If not done and nothing left, it's an incomplete request
+				if bufLen == 0 {
+					return nil, MALFORMED_REQ_LINE
+				}
+				// Otherwise loop again (though typically you'd return an error here)
+				continue
+			}
+			return nil, err
+		}
 	}
 	return request, nil
 }
