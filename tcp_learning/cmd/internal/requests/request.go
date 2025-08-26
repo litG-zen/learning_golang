@@ -47,6 +47,9 @@ func ParseRequestLine(b []byte) (*RequestLine, int, error) {
 	read := idx + len(SEPARATOR)
 
 	parts := bytes.Split(startLine, []byte(" ")) // we get an array of [Method, path, http-version]
+	if len(parts) != 3 {
+		return nil, 0, MALFORMED_REQ_LINE
+	}
 	httpParts := bytes.Split(parts[2], []byte("/"))
 
 	if len(httpParts) != 2 || string(httpParts[0]) != "HTTP" || string(httpParts[1]) != "1.1" {
@@ -109,7 +112,7 @@ func RequestFromReader(reader io.Reader) (*Request, error) {
 			return nil, err
 		}
 
-		// moving  data to beggining , and readjusting buffer length
+		// moving  data to beginning , and readjusting buffer length
 		copy(buf, buf[readN:bufLen])
 		bufLen -= readN
 	}
