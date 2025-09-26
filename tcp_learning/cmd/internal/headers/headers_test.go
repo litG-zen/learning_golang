@@ -10,7 +10,7 @@ import (
 func testHeadersParser(t *testing.T) {
 	// Test: Valid single header
 	headers := NewHeaders()
-	data := []byte("Host: localhost:42069\r\nFooFoo:  barbar    \r\n")
+	data := []byte("Host: localhost:42069\r\nFooFoo:  barbar  \r\n\r\n")
 	n, done, err := headers.Parse(data)
 	require.NoError(t, err)
 	require.NotNil(t, headers)
