@@ -48,7 +48,7 @@ func writeCommand(c io.ReadWriter, response string) error {
 }
 
 func RunAsyncTCPServer() error {
-	connected_clients := make(map[int]string)
+	connected_clients := make(map[int]*FDComm)
 
 	var max_client int = 20000
 
@@ -139,7 +139,7 @@ func RunAsyncTCPServer() error {
 					}
 					syscall.SetNonblock(serverFD, true)
 
-					connected_clients[connFD] = clientAddr
+					connected_clients[connFD] = &FDComm{Fd: connFD, ClientAddr: clientAddr}
 					fmt.Printf("New client connected. Total clients: %d\n", len(connected_clients))
 
 					var clientEvent syscall.EpollEvent = syscall.EpollEvent{
@@ -152,7 +152,7 @@ func RunAsyncTCPServer() error {
 						continue
 					}
 				} else {
-					comm := FDComm{Fd: int(event.Fd), ClientAddr: connected_clients[int(event.Fd)]}
+					comm := *connected_clients[int(event.Fd)]
 					cmd, err := readCommand(&comm, comm.ClientAddr)
 					if err != nil {
 						fmt.Printf("read error: %s\n", err)
