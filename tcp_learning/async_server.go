@@ -16,7 +16,8 @@ const (
 // //////////////////////////////////////////////////////////////////////////////////
 
 type FDComm struct {
-	Fd int
+	Fd         int
+	ClientAddr string
 }
 
 func (c *FDComm) Read(b []byte) (int, error) {
@@ -30,13 +31,15 @@ func (c *FDComm) Write(b []byte) (int, error) {
 // //////////////////////////////////////////////////////////////////////////////////
 
 // Socket read and write functions
-func readCommand(c io.ReadWriter) (string, error) {
+func readCommand(c io.ReadWriter, clientAddr string) (string, error) {
 	var buf []byte = make([]byte, 1024)
 	n, err := c.Read(buf)
 	if err != nil {
 		return "", err
 	}
-	return string(buf[:n]), nil
+	received := string(buf[:n])
+	fmt.Printf("Received from %s: %s\n", clientAddr, received)
+	return received, nil
 }
 
 func writeCommand(c io.ReadWriter, response string) error {
@@ -45,7 +48,7 @@ func writeCommand(c io.ReadWriter, response string) error {
 }
 
 func RunAsyncTCPServer() error {
-	var connected_clients int = 0
+	connected_clients := make(map[int]string)
 
 	var max_client int = 20000
 
@@ -75,7 +78,7 @@ func RunAsyncTCPServer() error {
 
 	// Bind the IP and port to the socket.
 	ip := net.ParseIP(HOST)
-	fmt.Printf("Server is listening on %s:%d:%s\n", HOST, PORT, ip)
+	fmt.Printf("Server is listening on %s:%d\n", HOST, PORT)
 	if err = syscall.Bind(serverFD, &syscall.SockaddrInet4{
 		Port: PORT,
 		Addr: [4]byte{ip[0], ip[1], ip[2], ip[3]},
@@ -114,6 +117,8 @@ func RunAsyncTCPServer() error {
 		} else {
 			for i := 0; i < eventCount; i++ {
 				event := events[i]
+				var clientAddr string
+
 				if event.Fd == int32(serverFD) {
 					// This means that there is a new incoming connection on the server socket.
 					connFD, client_addr, err := syscall.Accept(serverFD)
@@ -122,18 +127,20 @@ func RunAsyncTCPServer() error {
 						continue
 					}
 
-					connected_clients++
-					fmt.Printf("New client connecte. Total clients: %d\n", connected_clients)
-
 					switch addr := client_addr.(type) {
 					case *syscall.SockaddrInet4:
-						fmt.Printf("New connection from %s:%d\n", net.IP(addr.Addr[:]), addr.Port)
+						clientAddr = fmt.Sprintf("%s:%d", net.IP(addr.Addr[:]), addr.Port)
+						fmt.Printf("New connection from %s\n", clientAddr)
 					case *syscall.SockaddrInet6:
-						fmt.Printf("New connection from %s:%d\n", net.IP(addr.Addr[:]), addr.Port)
+						clientAddr = fmt.Sprintf("%s:%d", net.IP(addr.Addr[:]), addr.Port)
+						fmt.Printf("New connection from %s\n", clientAddr)
 					default:
 						fmt.Printf("Unknown client address type\n")
 					}
 					syscall.SetNonblock(serverFD, true)
+
+					connected_clients[connFD] = clientAddr
+					fmt.Printf("New client connected. Total clients: %d\n", len(connected_clients))
 
 					var clientEvent syscall.EpollEvent = syscall.EpollEvent{
 						Events: syscall.EPOLLIN, // EPOLLIN: This event is triggered when there is data to read on the socket.
@@ -145,13 +152,13 @@ func RunAsyncTCPServer() error {
 						continue
 					}
 				} else {
-					comm := FDComm{Fd: int(event.Fd)}
-					cmd, err := readCommand(&comm)
+					comm := FDComm{Fd: int(event.Fd), ClientAddr: connected_clients[int(event.Fd)]}
+					cmd, err := readCommand(&comm, comm.ClientAddr)
 					if err != nil {
 						fmt.Printf("read error: %s\n", err)
 						syscall.Close(int(event.Fd))
-						connected_clients--
-						fmt.Printf("Client disconnected. Total clients: %d\n", connected_clients)
+						delete(connected_clients, int(event.Fd))
+						fmt.Printf("Client disconnected. Total clients: %d\n", len(connected_clients))
 						continue
 					}
 					writeCommand(&comm, cmd)
