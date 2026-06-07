@@ -32,13 +32,21 @@ func (c *FDComm) Write(b []byte) (int, error) {
 
 // Socket read and write functions
 func readCommand(c io.ReadWriter, clientAddr string) (string, error) {
-	var buf []byte = make([]byte, 1024)
+	buf := make([]byte, 1024)
+
 	n, err := c.Read(buf)
 	if err != nil {
 		return "", err
 	}
+
+	if n == 0 {
+		return "", io.EOF
+	}
+
 	received := string(buf[:n])
+
 	fmt.Printf("Received from %s: %s\n", clientAddr, received)
+
 	return received, nil
 }
 
@@ -155,10 +163,9 @@ func RunAsyncTCPServer() error {
 					comm := *connected_clients[int(event.Fd)]
 					cmd, err := readCommand(&comm, comm.ClientAddr)
 					if err != nil {
-						fmt.Printf("read error: %s\n", err)
+						fmt.Printf("%s client disconnected. Total clients left: %d\n", comm.ClientAddr, len(connected_clients)-1)
 						syscall.Close(int(event.Fd))
 						delete(connected_clients, int(event.Fd))
-						fmt.Printf("Client disconnected. Total clients: %d\n", len(connected_clients))
 						continue
 					}
 					writeCommand(&comm, cmd)
