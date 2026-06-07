@@ -116,13 +116,23 @@ func RunAsyncTCPServer() error {
 				event := events[i]
 				if event.Fd == int32(serverFD) {
 					// This means that there is a new incoming connection on the server socket.
-					connFD, _, err := syscall.Accept(serverFD)
+					connFD, client_addr, err := syscall.Accept(serverFD)
 					if err != nil {
 						fmt.Printf("accept error: %s\n", err)
 						continue
 					}
+
 					connected_clients++
 					fmt.Printf("New client connecte. Total clients: %d\n", connected_clients)
+
+					switch addr := client_addr.(type) {
+					case *syscall.SockaddrInet4:
+						fmt.Printf("New connection from %s:%d\n", net.IP(addr.Addr[:]), addr.Port)
+					case *syscall.SockaddrInet6:
+						fmt.Printf("New connection from %s:%d\n", net.IP(addr.Addr[:]), addr.Port)
+					default:
+						fmt.Printf("Unknown client address type\n")
+					}
 					syscall.SetNonblock(serverFD, true)
 
 					var clientEvent syscall.EpollEvent = syscall.EpollEvent{
